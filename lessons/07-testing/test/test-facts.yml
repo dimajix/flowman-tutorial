@@ -45,9 +45,6 @@ tests:
             wban: 63897
             country: DE
 
-    targets:
-      - validate_stations_raw
-
     assertions:
       measurements_joined:
         kind: sql

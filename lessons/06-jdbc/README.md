@@ -1,17 +1,16 @@
-# Preparing the Environment
+# Lesson 6 - Accessing SQL Databases
 
-Since we will read from S3, you need some valid S3 credentials
-    AWS_ACCESS_KEY_ID=your_aws_key
-    AWS_SECRET_ACCESS_KEY=your_aws_secret
-    AWS_PROXY_HOST=
-    AWS_PROXY_PORT=
+## Core Concepts
 
-# Using flowman
+## Project
 
-## Running the whole project
+### Relations
 
-    flowexec -f examples/weather project run
+### Mappings
 
-## Executing outputs
+### Schema
 
-    flowexec -f examples/weather target build
+### Job
+
+## Execution
+
