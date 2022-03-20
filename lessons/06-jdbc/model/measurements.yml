@@ -1,0 +1,28 @@
+relations:
+  measurements:
+    kind: sqlserver
+    # Specify the JDBC connection to use
+    connection: sql_server
+    # Specify the namespace within the database
+    database: dbo
+    # Specify the table within the database
+    table: measurement
+    # Specify a schema, which uses appropriate data types for SQL Server
+    schema:
+      kind: spark
+      file: "${project.basedir}/schema/measurements.json"
+    # Add a (logical) partition column for simpler data management
+    partitions:
+      - name: year
+        type: integer
+        granularity: 1
+    # (Optionally) specify a primary key
+    primaryKey:
+      - usaf
+      - wban
+      - date
+      - time
+    # (Optionally) specify indexes
+    indexes:
+      - name: "measurement_idx0"
+        columns: [usaf, wban]
