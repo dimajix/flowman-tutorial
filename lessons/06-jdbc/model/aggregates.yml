@@ -1,11 +1,13 @@
 relations:
   aggregates:
-    kind: file
+    kind: sqlserver
     # Specify the file format to use
-    format: parquet
-    # Specify the base directory where all data is stored. This location does not include the partition pattern
-    location: "$basedir/aggregates/"
-    # Add partition column, which can be used in the `pattern`
+    format: sql_server
+    # Specify the namespace within the database
+    database: dbo
+    # Specify the table within the database
+    table: aggregates
+    # Add (logical) partition column
     partitions:
       - name: year
         type: integer

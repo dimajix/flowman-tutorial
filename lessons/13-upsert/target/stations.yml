@@ -1,0 +1,6 @@
+targets:
+  stations:
+    kind: relation
+    mapping: stations_raw
+    relation: stations
+    mode: upsert

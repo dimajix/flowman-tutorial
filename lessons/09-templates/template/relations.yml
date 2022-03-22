@@ -1,0 +1,25 @@
+templates:
+  partitionedRelation:
+    kind: target
+    parameters:
+      - name: table
+        type: string
+      - name: mapping
+        type: string
+    template:
+      aggregates:
+        kind: sqlserver
+        # Specify the file format to use
+        format: sql_server
+        # Specify the namespace within the database
+        database: dbo
+        # Specify the table within the database
+        table: $table
+        # Add (logical) partition column
+        partitions:
+          - name: year
+            type: integer
+            granularity: 1
+        schema:
+          kind: mapping
+          mapping: $mapping

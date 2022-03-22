@@ -1,0 +1,7 @@
+targets:
+  # Define build target for measurements
+  measurements:
+    kind: template/writePartitionedTarget
+    description: "Write extracted measurements per year"
+    mapping: measurements
+    table: measurements

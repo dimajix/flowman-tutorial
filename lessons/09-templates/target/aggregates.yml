@@ -1,0 +1,6 @@
+targets:
+  aggregates:
+    kind: template/writePartitionedTarget
+    description: "Write aggregated measurements per year"
+    mapping: aggregates
+    table: aggregates

@@ -1,0 +1,24 @@
+mappings:
+  # This mapping refers to the "raw" relation and reads in data from the source in S3
+  stations_raw:
+    kind: readRelation
+    relation: stations_raw
+
+  # The following mapping changes the data types to ones which are suitable for an SQL database
+  stations_conformed:
+    kind: cast
+    input: stations_raw
+    columns:
+      usaf: CHAR(6)
+      wban: CHAR(5)
+      name: VARCHAR(32)
+      country: CHAR(2)
+      state: CHAR(2)
+      icao: CHAR(4)
+      date_begin: date
+      date_end: date
+
+  # This mapping refers to the Parquet relation and reads in data from the local file system
+  stations:
+    kind: readRelation
+    relation: stations

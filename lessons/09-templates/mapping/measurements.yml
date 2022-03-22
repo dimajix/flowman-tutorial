@@ -7,7 +7,7 @@ mappings:
       year: $year
 
   # Extract multiple columns from the raw measurements data using SQL SUBSTR functions
-  measurements_extracted:
+  measurements:
     kind: select
     input: measurements_raw
     columns:
@@ -23,11 +23,3 @@ mappings:
       wind_speed_qual: "SUBSTR(raw_data,70,1)"
       air_temperature: "CAST(CAST(SUBSTR(raw_data,88,5) AS FLOAT)/10 AS FLOAT)"
       air_temperature_qual: "SUBSTR(raw_data,93,1)"
-
-
-  # This mapping refers to the processed data stored as Parquet on the local filesystem
-  measurements:
-    kind: read
-    relation: measurements
-    partitions:
-      year: $year

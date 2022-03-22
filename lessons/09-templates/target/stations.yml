@@ -1,0 +1,8 @@
+targets:
+  # Define a build target "stations"...
+  stations:
+    kind: template/writeUnpartitionedTarget
+    # ... by reading the result from the mapping "stations_conformed"
+    mapping: stations_conformed
+    # ... and by writing the records to the relation "stations"
+    table: stations

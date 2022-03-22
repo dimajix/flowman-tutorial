@@ -25,9 +25,23 @@ mappings:
       air_temperature_qual: "SUBSTR(raw_data,93,1)"
 
 
-  # This mapping refers to the processed data stored as Parquet on the local filesystem
-  measurements:
-    kind: read
-    relation: measurements
-    partitions:
-      year: $year
+  # Since our SQL table will use a primary key, we need to provide a mapping to ensure this constraint
+  measurements_deduplicated:
+    kind: aggregate
+    input: measurements_extracted
+    # List the elements of the primary key
+    dimensions:
+      - usaf
+      - wban
+      - date
+      - time
+    # Perform an aggregation, picking one non-NULL entry per item
+    aggregations:
+      report_type: "FIRST(report_type, True)"
+      wind_direction: "FIRST(CASE WHEN wind_direction_qual='1' THEN wind_direction END, True)"
+      wind_direction_qual: "FIRST(wind_direction_qual, True)"
+      wind_observation: "FIRST(wind_observation, True)"
+      wind_speed: "FIRST(CASE WHEN wind_speed_qual='1' THEN wind_speed END, True)"
+      wind_speed_qual: "FIRST(wind_speed_qual, True)"
+      air_temperature: "FIRST(CASE WHEN air_temperature_qual='1' THEN air_temperature END, True)"
+      air_temperature_qual: "FIRST(air_temperature_qual, True)"

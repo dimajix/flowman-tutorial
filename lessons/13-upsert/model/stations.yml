@@ -1,0 +1,18 @@
+relations:
+  stations:
+    kind: sqlserver
+    description: "The 'stations' table contains meta data on all weather stations"
+    # Specify the JDBC connection to use
+    connection: sql_server
+    # Specify the namespace within the database
+    database: dbo
+    # Specify the table within the database
+    table: stations
+    # Use the inferred schema of a mapping. This should be the same mapping as is used for writing
+    schema:
+      kind: mapping
+      mapping: stations_conformed
+    # Specify a primary key which will be used for UPSERT operations
+    primaryKey:
+      - usaf
+      - wban
