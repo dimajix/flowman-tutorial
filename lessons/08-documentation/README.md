@@ -1,17 +1,8 @@
-# Preparing the Environment
+# Lesson 8  - Documentation
 
-Since we will read from S3, you need some valid S3 credentials
-    AWS_ACCESS_KEY_ID=your_aws_key
-    AWS_SECRET_ACCESS_KEY=your_aws_secret
-    AWS_PROXY_HOST=
-    AWS_PROXY_PORT=
+### Objectives
 
-# Using flowman
-
-## Running the whole project
-
-    flowexec -f examples/weather project run
-
-## Executing outputs
-
-    flowexec -f examples/weather target build
+* You understand the necessity of providing a project documentation
+* You know how annotate entities with documentation
+* You know how add data quality checks to the documentation
+* You know how to generate a documentation from your project

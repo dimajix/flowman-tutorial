@@ -1,17 +1,7 @@
-# Preparing the Environment
+# Lesson 10 - Metrics
 
-Since we will read from S3, you need some valid S3 credentials
-    AWS_ACCESS_KEY_ID=your_aws_key
-    AWS_SECRET_ACCESS_KEY=your_aws_secret
-    AWS_PROXY_HOST=
-    AWS_PROXY_PORT=
+### Objectives
 
-# Using flowman
-
-## Running the whole project
-
-    flowexec -f examples/weather project run
-
-## Executing outputs
-
-    flowexec -f examples/weather target build
+* You understand the necessity of meaningful execution metrics
+* You know how to configure metric collection and publication
+* You know how to define custom metrics as measures for data quality

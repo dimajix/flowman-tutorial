@@ -1,17 +1,6 @@
-# Preparing the Environment
+# Lesson 11 - Verify and Validate
 
-Since we will read from S3, you need some valid S3 credentials
-    AWS_ACCESS_KEY_ID=your_aws_key
-    AWS_SECRET_ACCESS_KEY=your_aws_secret
-    AWS_PROXY_HOST=
-    AWS_PROXY_PORT=
+### Objectives
 
-# Using flowman
-
-## Running the whole project
-
-    flowexec -f examples/weather project run
-
-## Executing outputs
-
-    flowexec -f examples/weather target build
+* You understand the concepts of validation and verification phase in Flowman
+* You know how add verify and validate targets to your project

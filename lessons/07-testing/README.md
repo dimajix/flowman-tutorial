@@ -1,10 +1,11 @@
-# Preparing the Environment
+# Lesson 7 - Testing
 
-Since we will read from S3, you need some valid S3 credentials
-    AWS_ACCESS_KEY_ID=your_aws_key
-    AWS_SECRET_ACCESS_KEY=your_aws_secret
-    AWS_PROXY_HOST=
-    AWS_PROXY_PORT=
+### Objectives
+
+* You understand the necessity of writing unittests
+* You know how to implement unittests in Flowman
+* You know how to mock external data sources
+
 
 # Using flowman
 

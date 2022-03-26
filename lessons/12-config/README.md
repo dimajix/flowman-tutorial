@@ -1,18 +1,5 @@
-# Lesson 1 - Flowman Basics
+# Lesson 12 - Configuration
 
+### Objectives
 
-## Core Concepts
-
-## Project
-
-### project.yml
-
-### Environment
-
-### Relations
-
-### Mappings
-
-### Targets
-
-## Execution
+* You have an idea about relevant configuration options in Flowman and how to set them
