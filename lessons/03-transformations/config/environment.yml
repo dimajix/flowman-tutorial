@@ -1,0 +1,4 @@
+environment:
+  - basedir=file:///tmp/weather
+  # Define an environment variable to process only a single year
+  - year=2013

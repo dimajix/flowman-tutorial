@@ -1,3 +1,2 @@
 environment:
   - basedir=file:///tmp/weather
-  - year=2013

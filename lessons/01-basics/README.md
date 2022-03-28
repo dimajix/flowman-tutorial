@@ -130,10 +130,6 @@ are specific for the `file` kind.
 The [Flowman documentation](https://flowman.readthedocs.io/en/latest/spec/relation/index.html#relation-types) contains 
 many other relation types, each with a different `kind` and specific properties.
 
-Most relations support a `schema` property, which contains the description of the data, i.e. the column names and data
-types. Flowman supports [different schema kinds](https://flowman.readthedocs.io/en/latest/spec/schema/index.html#schema-types) 
-as well, in our example we use an Avro schema definition file stored in an external file.
-
 ```yaml
 relations:
   stations_raw:
@@ -150,14 +146,10 @@ relations:
       quote: "\""
       header: "true"
       dateFormat: "yyyyMMdd"
-    # Specify the schema (which is stored in an external file)
-    schema:
-      kind: avro
-      file: "${project.basedir}/schema/stations.avsc"
 ```
-
-Also note that the schema definition uses the pre-defined environment variable `project.basedir` to specify the location
-of the Avro schema definition file inside the project directory.
+Note that we did not specify any schema definition (i.e. which columns are contained in the CSV file). Instead, we will 
+let Flowman use the column names from the header line in the CSV file. In the next lesson we will learn a better
+alternative to explicitly specify a schema.
 
 #### Target Relation
 We also need to specify a relation to hold the data written by Flowman. Again we use a `file` relation, but this time
@@ -172,9 +164,6 @@ relations:
     description: "The 'stations' table contains meta data on all weather stations"
     format: parquet
     location: "$basedir/stations/"
-    schema:
-      kind: avro
-      file: "${project.basedir}/schema/stations.avsc"
 ```
 
 Note that both the source and target locations actually are defined in a generic way and do not contain any information
@@ -201,6 +190,33 @@ is not a real transformation, but the entry point of a data flow. We don't do an
 lesson, so we don't require any additional mapping. You can find an overview of available mappings in the
 [Flowman documentation](https://flowman.readthedocs.io/en/latest/spec/mapping/index.html#mapping-types).
 
+In this first lesson we also need to define a second mapping in order to rename the incoming column names. The original
+column names are taken from the CSV file and some of them contain problematic characters like space and braces. We
+can easily adjust the columns by adding a `select` mapping:
+
+```yaml
+mappings:
+  stations_conformed:
+    # Specify the mapping kind  
+    kind: select
+    # Specify the mapping which serve as the input to this one
+    input: stations_raw
+    # Now list all output columns with SQL expressions which refer to the columns of the input mapping
+    columns:
+      usaf: "USAF"
+      wban: "WBAN"
+      name: "`STATION NAME`"
+      country: "CTRY"
+      state: "STATE"
+      icao: "ICAO"
+      latitude: "CAST(LAT AS FLOAT)"
+      longitude: "CAST(LON AS FLOAT)"
+      elevation: "CAST(`ELEV(M)` AS FLOAT)"
+      date_begin: "CAST(BEGIN AS DATE)"
+      date_end: "CAST(END AS DATE)"
+```
+We will learn a better approach how to provide an appropriate data schema in the next lesson, though.
+
 
 ### Targets & Jobs
 So far we have defined a source relation, a target relation and a trivial data flow which simply reads from the source
@@ -221,8 +237,8 @@ targets:
   stations:
     # ... which builds a relation
     kind: relation
-    # ... by reading the result from the mapping "stations_raw"
-    mapping: stations_raw
+    # ... by reading the result from the mapping "stations_conformed"
+    mapping: stations_conformed
     # ... and by writing the records to the relation "stations"
     relation: stations
 ```
@@ -279,61 +295,8 @@ But of course you can always force execution by adding a `--force` parameter to 
 flowexec -f lessons/01-basics job build main --force
 ```
 
-### Execution Phases
-Flowman sees data as artifacts with a common lifecycle, from creation until deletion. The lifecycle itself consists of
-multiple different phases, each of them representing one stage of the whole lifecycle.
-
-#### Lifecycle Phases
-The full lifecycle consists out of specific execution phases, as follows:
-
-1. **VALIDATE**.
-   This first phase is used for validation and any error will stop the next steps. A validation step might for example
-   check preconditions on data sources which are a hard requirement.
-
-2. **CREATE**.
-   This will create all relations (tables and directories) specified as targets. The tables will not contain any data,
-   they only provide an empty hull. If a target already exists, a migration will be started instead. This will migrate a
-   relation (table or directory) to a new schema, if required. Note that this is not supported by all target types, and
-   even if a target supports migration in general, it may not be possible due to unmigratable changes.
-
-3. **BUILD**.
-   The *build* phase will actually create all records and fill them into the specified relations.
-
-4. **VERIFY**.
-   The *verify* phase will perform simple checks (for example if a specific Hive partition exists), or may also include
-   some specific user defined tests that compare data. If verification fails, the build process stops.
-
-5. **TRUNCATE**.
-   *Truncate* is the first of two phases responsible for cleanup. *Truncate* will only remove individual partitions from
-   tables (i.e. it will delete data), but it will keep tables alive.
-
-6. **DESTROY**.
-   The final phase *destroy* is used to physically remove relations including their data. This will also remove table
-   definitions, views and directories. It performs the opposite operation than the *create* phase.
-
-Some execution phases can be performed in a meaningful way one after the other. Such a sequence of phases is
-called *lifecycle*. Flowman has the following lifecycles built in:
-
-#### Build
-The first lifecycle contains the three phases *VALIDATE*, *CREATE*, *BUILD* and *VERIFY*.
-
-#### Truncate
-The second lifecycle contains only the single phase *TRUNCATE*
-
-#### Destroy
-The last lifecycle contains only the single phase *DESTROY*
-
-### Execution of Phases and Lifecycles
-
-Another lifecycle can be executed by replacing `build` with another execution phase. Flowman will then execute the
-lifecycle containing that phase up until this phase. If you want to skip all other execution phases, you can specify
-`--no-lifecycle` on the command line.
-
-```shell
-flowexec -f <project_dirctory> job <execution_phase> <job_name> [--force] [--no-lifecycle]
-```
-
 
 ## Next Lessons
-In the next lessons, we will have a closer look at more complex transformations than only reading data and we will
-also learn how to use job parameters and the effect of multiple build targets within a single job.
+In the next lessons, we will have a closer look at explicit schema definitions, more complex transformations than only 
+reading data and we will also learn how to use job parameters and the effect of multiple build targets within a single
+job.

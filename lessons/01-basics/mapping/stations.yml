@@ -1,5 +1,25 @@
 mappings:
   # This mapping refers to the "raw" relation and reads in data from the source in S3
   stations_raw:
+    # Specify the mapping kind
     kind: read
     relation: stations_raw
+
+  stations_conformed:
+    # Specify the mapping kind
+    kind: select
+    # Specify the mapping which serve as the input to this one
+    input: stations_raw
+    # Now list all output columns with SQL expressions which refer to the columns of the input mapping
+    columns:
+      usaf: "USAF"
+      wban: "WBAN"
+      name: "`STATION NAME`"
+      country: "CTRY"
+      state: "STATE"
+      icao: "ICAO"
+      latitude: "CAST(LAT AS FLOAT)"
+      longitude: "CAST(LON AS FLOAT)"
+      elevation: "CAST(`ELEV(M)` AS FLOAT)"
+      date_begin: "CAST(BEGIN AS DATE)"
+      date_end: "CAST(END AS DATE)"

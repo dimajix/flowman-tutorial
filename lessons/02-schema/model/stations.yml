@@ -1,0 +1,31 @@
+relations:
+  stations:
+    kind: file
+    description: "The 'stations' table contains meta data on all weather stations"
+    format: parquet
+    location: "$basedir/stations/"
+    schema:
+      kind: embedded
+      fields:
+        - name: "usaf"
+          type: string
+        - name: "wban"
+          type: string
+        - name: "name"
+          type: string
+        - name: "country"
+          type: string
+        - name: "state"
+          type: string
+        - name: "icao"
+          type: string
+        - name: "latitude"
+          type: float
+        - name: "longitude"
+          type: float
+        - name: "elevation"
+          type: float
+        - name: "date_begin"
+          type: date
+        - name: "date_end"
+          type: date

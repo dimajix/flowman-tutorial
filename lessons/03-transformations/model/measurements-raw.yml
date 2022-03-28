@@ -3,9 +3,9 @@ relations:
     kind: file
     format: text
     location: "s3a://dimajix-training/data/weather/"
-    # Define the pattern to be used for partitions
+    # Define the pattern to be used for partitions. The pattern uses the "year" partition column defined below
     pattern: "${year}"
-    # Define data partitions. Each year is stored in a separate sub directory
+    # Define data partitions. Each year is stored in a separate subdirectory
     partitions:
       - name: year
         type: integer
