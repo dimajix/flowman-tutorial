@@ -5,10 +5,14 @@ will guide you through the basic core concepts of Flowman and will learn how to 
 All lessons will use a subset of a publicly available data set about weather data. This first lesson will only focus
 on the weather stations metadata and perform a technical format conversion from CSV to Parquet.
 
+## 1. What to Expect
+
 ### Objectives
 * You will understand Flowmans philosophy and development workflow
 * You will get known to the main entities in Flowman which make up a project
 * You will learn how to use Flowmans command line tool to execute a project
+
+You can find the full source code of this lesson [on GitHub](https://github.com/dimajix/flowman-tutorial/tree/develop/lessons/01-basics)
 
 ### Description
 As described above, this first lesson will perform a technical format conversion. We will read in a CSV file from
@@ -22,7 +26,7 @@ So we will perform the following steps:
 2. Write weather station metadata as Parquet files into local file system
 
 
-## Core Concepts
+## 2. Core Concepts
 
 Flowman is a sophisticated tool to create data transformation applications using a declarative syntax. Although
 being based on Apache Spark, Flowman will take care of many low level technical details, so you do not need to be
@@ -32,17 +36,17 @@ Flowman adds a layer of abstraction on top of Apache Spark and provides a consis
 describing all data sources, data sinks and data transformations between them.
 
 
-## Project
+## 3. Project
 
 First Flowman uses the term *project* to bundle multiple data sources, sinks and transformations into a single package.
 As we will see, you can have multiple data transformation pipelines in a single project.
 
-### project.yml
+### 3.1 project.yml
 
 The entry point of each Flowman project is a `project.yml` file, which contains project metadata like a project name,
 an optional project version. The main information in a `project.yml` file simply is a list of subdirectories containing
-the source code as additional YAML files containing all entity descriptions. The YAML files inside subdirectories will 
-be read by Flowman and deserialized to a logical entity model. 
+the source code as additional YAML files containing all entity descriptions. The YAML files inside subdirectories will
+be read by Flowman and deserialized to a logical entity model.
 
 It is completely up to you how you want to organize all YAML files in subdirectories. In this tutorial, we simply
 use separate subdirectories for different entity types. For example all *relations* (which describe data sources and
@@ -76,16 +80,16 @@ modules:
   - config
 ```
 
-### Configuration & Environment
+### 3.2 Configuration & Environment
 
 #### Configuration
 Apache Spark and Flowman might require some configurations, for example access keys to S3, proxy settings and so on.
-These are set in a `config` section, and are best kept in a central file. These Spark/Hadoop specific configuration 
+These are set in a `config` section, and are best kept in a central file. These Spark/Hadoop specific configuration
 properties are documented on the Spark homepage, while additional Flowman specific settings are documented in
 the Flowman documentation.
 
-In this example we will access data stored in Amazon S3, so we need to provide some configurations like an 
-anonymous credentials provider, proxy settings and so on. In this example all these configurations settings are stored 
+In this example we will access data stored in Amazon S3, so we need to provide some configurations like an
+anonymous credentials provider, proxy settings and so on. In this example all these configurations settings are stored
 in the file `config/aws.yml`, but you can provide multiple `config` sections in multiple files.
 
 ```yaml
@@ -113,7 +117,7 @@ environment:
 ```
 
 
-### Relations
+### 3.3 Relations
 
 Now that we have discussed the more technical and boring aspect of providing configuration settings and a single
 environment variable, we will now provide two *relations*. Each relation represents a physical storage, for example
@@ -127,7 +131,7 @@ relation (as most other Flowman entities) has a `kind` which defines the type of
 the `file` kind to create a relation containing files. All other properties defined in the `stations_raw` relation
 are specific for the `file` kind.
 
-The [Flowman documentation](https://flowman.readthedocs.io/en/latest/spec/relation/index.html#relation-types) contains 
+The [Flowman documentation](https://flowman.readthedocs.io/en/latest/spec/relation/index.html#relation-types) contains
 many other relation types, each with a different `kind` and specific properties.
 
 ```yaml
@@ -147,7 +151,7 @@ relations:
       header: "true"
       dateFormat: "yyyyMMdd"
 ```
-Note that we did not specify any schema definition (i.e. which columns are contained in the CSV file). Instead, we will 
+Note that we did not specify any schema definition (i.e. which columns are contained in the CSV file). Instead, we will
 let Flowman use the column names from the header line in the CSV file. In the next lesson we will learn a better
 alternative to explicitly specify a schema.
 
@@ -167,11 +171,11 @@ relations:
 ```
 
 Note that both the source and target locations actually are defined in a generic way and do not contain any information
-about being used as a data source or data sink. Flowman can use every relation as a source or target or even both 
+about being used as a data source or data sink. Flowman can use every relation as a source or target or even both
 within a single project, as we will see in a later lesson.
 
 
-### Mappings
+### 3.4 Mappings
 
 Now we only have defined a source and a target relation. In the next step we need to create a data flow for
 connecting them. First we define a *mapping*, which simply reads in the data from the source relation. This mapping
@@ -218,19 +222,19 @@ mappings:
 We will learn a better approach how to provide an appropriate data schema in the next lesson, though.
 
 
-### Targets & Jobs
+### 3.5 Targets & Jobs
 So far we have defined a source relation, a target relation and a trivial data flow which simply reads from the source
-relation. 
+relation.
 
 #### Build Targets
 Now we have to connect the result of the `stations_raw` mapping with the target relation. In Flowman this
 connection is established by creating an appropriate *build target*. Each build target represents actual work that
-needs to be performed. Again, Flowman implements different 
+needs to be performed. Again, Flowman implements different
 [build target types](https://flowman.readthedocs.io/en/latest/spec/target/index.html#target-types). The most
 important target is the [`relation`](https://flowman.readthedocs.io/en/latest/spec/target/relation.html) target
-which stores the result records of a mapping into a relation. 
+which stores the result records of a mapping into a relation.
 
-The file `target/stations.yml` if this example defines a single build target called `stations` as follows: 
+The file `target/stations.yml` if this example defines a single build target called `stations` as follows:
 ```yaml
 targets:
   # Define a build target "stations"...
@@ -261,7 +265,7 @@ jobs:
 ```
 
 
-## Execution
+## 4. Execution
 
 We now have defined a complete Flowman project including configuration, environment variables, relations, mappings,
 targets and a job. Now we want to execute this project by using the `flowexec` command line tool.
@@ -276,7 +280,7 @@ In our example this means:
 flowexec -f lessons/01-basics job build main
 ```
 
-### Overriding Environment Variables
+### 4.1 Overriding Environment Variables
 You can also redefine any environment variable on the command line by using the `-D <variable>=<value>` command line
 option:
 ```shell
@@ -284,7 +288,7 @@ flowexec -f lessons/01-basics job build main -D basedir=/tmp/flowman
 ```
 Of course, you can use multiple parameters `-D` for defining different variables.
 
-### Dirty Targets
+### 4.2 Dirty Targets
 Flowman will only execute a target when it is considered to be *dirty*. For `relation` targets this means that the
 relation (or the partition) does not contain any data. Otherwise, Flowman will skip the execution of the target. You
 can see this feature when you execute that job a second time. In this case Flowman will see that the target relation
@@ -296,7 +300,7 @@ flowexec -f lessons/01-basics job build main --force
 ```
 
 
-## Next Lessons
-In the next lessons, we will have a closer look at explicit schema definitions, more complex transformations than only 
+## 5. Next Lessons
+In the next lessons, we will have a closer look at explicit schema definitions, more complex transformations than only
 reading data and we will also learn how to use job parameters and the effect of multiple build targets within a single
 job.

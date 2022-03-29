@@ -4,10 +4,14 @@ In this next installment of the Flowman tutorial we will work with a new data se
 themselves. These are stored in a proprietary, ASCII based text format. Therefore, we cannot simply use a CSV reader
 like we did before, instead we need to parse the lines using SQL `SUBSTR` operations.
 
+## 1. What to Expect
+
 ### Objectives
 * You will see more non-trivial transformations in action
 * You will learn an elegant way to let Flowman automatically generate the correct schema for outgoing relations
 * You will learn how to use data partitions
+
+You can find the full source code of this lesson [on GitHub](https://github.com/dimajix/flowman-tutorial/tree/develop/lessons/03-transformations)
 
 ### Description
 This time we will read in the raw measurement data, which contains many weather measurements per weather stations
@@ -21,9 +25,7 @@ So we will perform the following steps:
 3. Write weather measurements as Parquet files into local file system
 
 
-## Implementation
-
-## Project
+## 2. Implementation
 
 Again we start with a project definition file `project.yml`, which looks very similar to the previous ones:
 ```yaml
@@ -39,7 +41,7 @@ modules:
   - config
 ```
 
-### Configuration & Environment
+### 2.1 Configuration & Environment
 Configuration and environment is still stored in the files `config/aws.yml` and `config/environment.yml`. The only
 difference to the previous lesson is the addition of a new environment variable `year`, which will be used to process
 only a single year of measurements. Since each year could possibly contain millions of records, a common approach is
@@ -53,14 +55,14 @@ environment:
 ```
 
 We will learn a small but important improvement how to model this in Flowman in the next lesson instead of using a
-simple environment variable. 
+simple environment variable.
 
-### Relations
-Again we define two relations: One source relation containing the raw weather measurements stored in text file and one 
-target relation which contains the extracted and transformed measurements stored as Parquet files. There is one 
+### 2.2 Relations
+Again we define two relations: One source relation containing the raw weather measurements stored in text file and one
+target relation which contains the extracted and transformed measurements stored as Parquet files. There is one
 important difference to the last lesson, though: This time both the source and the target relation define a so called
 *partition column* which represents large chunks of data stored in different directories. In our example, data will
-be stored in different partitions for each year of measurement. This physical organization of data enables to 
+be stored in different partitions for each year of measurement. This physical organization of data enables to
 selectively process only individual years. Also query tools like Hive, Impala or Trino can make use of partition columns
 for pruning while directories when the partition column is used in a SQL `WHERE` condition.
 
@@ -71,31 +73,31 @@ focus on the fixed locations, which is far simpler to work with.
 
 But before going into details how to extract the attributes, we define the source relation called `measurements_raw`
 as a `file` relation with format `text` (as opposed to the format `csv` which we used before). We also add a logical
-*partition column* which enables the organization of all data files into separate subdirectories per year. The 
+*partition column* which enables the organization of all data files into separate subdirectories per year. The
 partition column `year` is mapped to a subdirectory as specified in the `pattern` property. The relation is defined
 in the file `model/measurements-raw.yml`.
 
 ```yaml
 relations:
-  measurements_raw:
-    kind: file
-    format: text
-    location: "s3a://dimajix-training/data/weather/"
-      # Define the pattern to be used for partitions. The pattern uses the "year" partition column defined below
-    pattern: "${year}"
-    # Define data partitions. Each year is stored in a separate subdirectory
-    partitions:
-      - name: year
-        type: integer
-        granularity: 1
-        description: "The year when the measurement was made"
-    schema:
-      # Specify the (single) column via an embedded schema.
-      kind: embedded
-      fields:
-        - name: raw_data
-          type: string
-          description: "Raw measurement data"
+    measurements_raw:
+        kind: file
+        format: text
+        location: "s3a://dimajix-training/data/weather/"
+        # Define the pattern to be used for partitions. The pattern uses the "year" partition column defined below
+        pattern: "${year}"
+        # Define data partitions. Each year is stored in a separate subdirectory
+        partitions:
+            - name: year
+              type: integer
+              granularity: 1
+              description: "The year when the measurement was made"
+        schema:
+            # Specify the (single) column via an embedded schema.
+            kind: embedded
+            fields:
+                - name: raw_data
+                  type: string
+                  description: "Raw measurement data"
 ```
 
 #### Target Relation
@@ -112,25 +114,25 @@ the build target as the source for writing to this relation.
 
 ```yaml
 relations:
-  measurements:
-    kind: file
-    format: parquet
-    location: "$basedir/measurements/"
-    # Do NOT define the pattern to be used for partitions. Then Flowman will use a standard pattern, which is
-    # well understood by Spark, Hive and many other tools
-    # pattern: "${year}"
-    # Define data partitions. Each year is stored in a separate subdirectory
-    partitions:
-      - name: year
-        type: integer
-        granularity: 1
-    # We use the inferred schema of the mapping that is written into the relation
-    schema:
-      kind: mapping
-      mapping: measurements_extracted
+    measurements:
+        kind: file
+        format: parquet
+        location: "$basedir/measurements/"
+        # Do NOT define the pattern to be used for partitions. Then Flowman will use a standard pattern, which is
+        # well understood by Spark, Hive and many other tools
+        # pattern: "${year}"
+        # Define data partitions. Each year is stored in a separate subdirectory
+        partitions:
+            - name: year
+              type: integer
+              granularity: 1
+        # We use the inferred schema of the mapping that is written into the relation
+        schema:
+            kind: mapping
+            mapping: measurements_extracted
 ```
 
-### Mappings
+### 2.3 Mappings
 In order to read the raw data and to extract the measurements we need two different mappings. These are defined in the
 file `mapping/measurements.yml`.
 
@@ -140,13 +142,13 @@ corresponds to one year of measurement data.
 
 ```yaml
 mappings:
-  # This mapping refers to the "raw" relation and reads in data from the source in S3
-  measurements_raw:
-    kind: read
-    relation: measurements_raw
-    # Set the data partition to be read
-    partitions:
-      year: $year
+    # This mapping refers to the "raw" relation and reads in data from the source in S3
+    measurements_raw:
+        kind: read
+        relation: measurements_raw
+        # Set the data partition to be read
+        partitions:
+            year: $year
 ```
 
 #### Extracting Measurements
@@ -156,26 +158,26 @@ We also perform appropriate data type conversions and scaling as needed.
 
 ```yaml
 mappings:
-  # Extract multiple columns from the raw measurements data using SQL SUBSTR functions
-  measurements_extracted:
-    kind: select
-    input: measurements_raw
-    columns:
-      usaf: "SUBSTR(raw_data,5,6)"
-      wban: "SUBSTR(raw_data,11,5)"
-      date: "TO_DATE(SUBSTR(raw_data,16,8), 'yyyyMMdd')"
-      time: "SUBSTR(raw_data,24,4)"
-      report_type: "SUBSTR(raw_data,42,5)"
-      wind_direction: "CAST(SUBSTR(raw_data,61,3) AS INT)"
-      wind_direction_qual: "SUBSTR(raw_data,64,1)"
-      wind_observation: "SUBSTR(raw_data,65,1)"
-      wind_speed: "CAST(CAST(SUBSTR(raw_data,66,4) AS FLOAT)/10 AS FLOAT)"
-      wind_speed_qual: "SUBSTR(raw_data,70,1)"
-      air_temperature: "CAST(CAST(SUBSTR(raw_data,88,5) AS FLOAT)/10 AS FLOAT)"
-      air_temperature_qual: "SUBSTR(raw_data,93,1)"
+    # Extract multiple columns from the raw measurements data using SQL SUBSTR functions
+    measurements_extracted:
+        kind: select
+        input: measurements_raw
+        columns:
+            usaf: "SUBSTR(raw_data,5,6)"
+            wban: "SUBSTR(raw_data,11,5)"
+            date: "TO_DATE(SUBSTR(raw_data,16,8), 'yyyyMMdd')"
+            time: "SUBSTR(raw_data,24,4)"
+            report_type: "SUBSTR(raw_data,42,5)"
+            wind_direction: "CAST(SUBSTR(raw_data,61,3) AS INT)"
+            wind_direction_qual: "SUBSTR(raw_data,64,1)"
+            wind_observation: "SUBSTR(raw_data,65,1)"
+            wind_speed: "CAST(CAST(SUBSTR(raw_data,66,4) AS FLOAT)/10 AS FLOAT)"
+            wind_speed_qual: "SUBSTR(raw_data,70,1)"
+            air_temperature: "CAST(CAST(SUBSTR(raw_data,88,5) AS FLOAT)/10 AS FLOAT)"
+            air_temperature_qual: "SUBSTR(raw_data,93,1)"
 ```
 
-### Targets
+### 2.4 Targets
 
 Finally, we also need to slightly adjust the build target. Since we are reading the input data in partitioned chunks
 per year, we also want to write the data with partitions. We already defined a partition column in the target relation,
@@ -183,33 +185,33 @@ now we need to specify the *value* of that partition column for the write operat
 
 ```yaml
 targets:
-  # Define build target for measurements
-  measurements:
-    # Again, the target is of type "relation"
-    kind: relation
-    description: "Write extracted measurements per year"
-    # Read records from mapping
-    mapping: measurements_extracted
-    # ... and write them into the relation "measurements"
-    relation: measurements
-    # Specify the data partition to be written
-    partition:
-      year: $year
+    # Define build target for measurements
+    measurements:
+        # Again, the target is of type "relation"
+        kind: relation
+        description: "Write extracted measurements per year"
+        # Read records from mapping
+        mapping: measurements_extracted
+        # ... and write them into the relation "measurements"
+        relation: measurements
+        # Specify the data partition to be written
+        partition:
+            year: $year
 ```
 
-### Jobs
+### 2.5 Jobs
 We also need to provide a job definition in `job/main.yml`, which simply references the single target defined above:
 
 ```yaml
 jobs:
-  # Define the 'main' job, which implicitly is used whenever you build the whole project
-  main:
-    # List all targets which should be built as part of the `main` job
-    targets:
-      - measurements
+    # Define the 'main' job, which implicitly is used whenever you build the whole project
+    main:
+        # List all targets which should be built as part of the `main` job
+        targets:
+            - measurements
 ```
 
-## Execution
+## 3. Execution
 
 With all pieces in place, we can simply execute the whole project with `flowexec`:
 
@@ -226,6 +228,6 @@ flowxec -f lessons/03-transformations job build main --force -D year=2014
 ```
 
 
-## Next Lessons
+## 4. Next Lessons
 
 In the next lesson we will learn how to parametrize Flowman jobs to better fit processing of partitioned data.

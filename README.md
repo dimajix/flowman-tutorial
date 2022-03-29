@@ -3,11 +3,12 @@
 Welcome to this tutorial for developing data transformation applications with Flowman. In a sequence of multiple
 lessons, you will start learning the basic concepts of Flowman and later get known to more advanced features of
 Flowman. All lessons will use a subset of a publicly available data set about weather data. This data is taken from
+[Global Hourly - Integrated Surface Database (ISD)](https://www.ncdc.noaa.gov/isd).
 
 
 ## Running Flowman in Docker
 
-The easiest way to follow the tutorial is to use the provided `docker-compose.yml` which will start a Docker container
+The simplest way to follow the tutorial is to use the provided `docker-compose.yml` which will start a Docker container
 containing Flowman with all lessons mounted as a volume.
 
 
