@@ -1,7 +1,7 @@
 mappings:
   # This mapping refers to the "raw" relation and reads in data from the source in S3
   measurements_raw:
-    kind: read
+    kind: relation
     relation: measurements_raw
     partitions:
       year: $year
@@ -24,11 +24,24 @@ mappings:
       air_temperature: "CAST(CAST(SUBSTR(raw_data,88,5) AS FLOAT)/10 AS FLOAT)"
       air_temperature_qual: "SUBSTR(raw_data,93,1)"
 
+  # Assign appropriate data types, which suite better to SQL databases
+  measurements_conformed:
+    kind: cast
+    input: measurements_extracted
+    columns:
+      usaf: CHAR(6)
+      wban: CHAR(5)
+      time: CHAR(4)
+      report_type: CHAR(5)
+      wind_direction_qual: CHAR(1)
+      wind_observation: CHAR(1)
+      wind_speed_qual: CHAR(1)
+      air_temperature_qual: CHAR(1)
 
   # Since our SQL table will use a primary key, we need to provide a mapping to ensure this constraint
   measurements_deduplicated:
     kind: aggregate
-    input: measurements_extracted
+    input: measurements_conformed
     # List the elements of the primary key
     dimensions:
       - usaf

@@ -1,6 +1,6 @@
 relations:
   stations:
-    kind: sqlserver
+    kind: jdbcTable
     description: "The 'stations' table contains meta data on all weather stations"
     # Specify the JDBC connection to use
     connection: sql_server

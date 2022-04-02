@@ -1,8 +1,8 @@
 relations:
   aggregates:
-    kind: sqlserver
-    # Specify the file format to use
-    format: sql_server
+    kind: jdbcTable
+    # Specify the JDBC connection to use
+    connection: sql_server
     # Specify the namespace within the database
     database: dbo
     # Specify the table within the database
@@ -15,7 +15,7 @@ relations:
     # Specify an optional schema here. It is always recommended to explicitly specify a schema for every relation
     # and not just let data flow from a mapping into a target.
     schema:
-      kind: embedded
+      kind: inline
       fields:
         - name: country
           type: STRING

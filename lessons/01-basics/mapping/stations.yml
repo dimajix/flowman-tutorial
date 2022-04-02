@@ -2,7 +2,7 @@ mappings:
   # This mapping refers to the "raw" relation and reads in data from the source in S3
   stations_raw:
     # Specify the mapping kind
-    kind: read
+    kind: relation
     relation: stations_raw
 
   stations_conformed:

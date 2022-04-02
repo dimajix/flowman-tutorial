@@ -1,6 +1,6 @@
 relations:
   measurements:
-    kind: sqlserver
+    kind: jdbcTable
     # Specify the JDBC connection to use
     connection: sql_server
     # Specify the namespace within the database
