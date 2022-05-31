@@ -17,6 +17,7 @@ jobs:
     metrics:
       labels:
         project: "${project.name}"
+        phase: "${phase}"
       metrics:
         - selector:
             name: ".*"

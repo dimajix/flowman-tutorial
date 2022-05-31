@@ -2,6 +2,19 @@ name: "default"
 
 metrics:
   - kind: console
+  - kind: jdbc
+    labels:
+      project: ${project.name}
+      version: ${project.version}
+      phase: ${phase}
+    connection:
+      kind: jdbc
+      url: jdbc:sqlserver://localhost:1433
+      driver: "com.microsoft.sqlserver.jdbc.SQLServerDriver"
+      username: "sa"
+      password: "yourStrong(!)Password"
+      properties:
+        databaseName: weather
 
 config:
   - spark.sql.warehouse.dir=/opt/sxp/flowman/hive/warehouse
