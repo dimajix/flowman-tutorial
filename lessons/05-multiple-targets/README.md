@@ -336,3 +336,8 @@ With these entities in place we ca now execute the project as follows:
 cd /opt/flowman
 flowexec -f lessons/05-multiple-targets job build main year=2014 --force
 ```
+
+
+## 4. Next Lesson
+In the next lesson, we will start using the Flowman shell as an interactive development tool for working with 
+Flowman projects.
