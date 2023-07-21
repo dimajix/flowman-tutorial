@@ -1,19 +1,27 @@
-# Lesson 7 - Execution Phases and Lifecycles
+# Lesson 7 — Execution Phases and Lifecycles
+
+Flowman implements a lifecycle model for managing physical data containers like files and tables. This lifecycle
+model simplifies typical engineering tasks, like creating the required output tables, populating them with data
+or removing individual data partitions.
+
+## 1. What to Expect
 
 ### Objectives
 
-* You will learn how to use Flowman Shell to support development
-* You will know the most important command of Flowman Shell
-* You will understand job contexts and why they are required
+* You will learn about the basic idea of the lifecycle model
+* You will learn how to execute specific execution phases in your project
 
-### Processing Steps
+### Description
+
+Since this chapter only describes an additional development tool for Flowman, we will simply reuse the project of the
+last chapter. The project includes one job with multiple targets and relations.
 
 
-## Execution Phases
+## 2. Execution Phases
 Flowman sees data as artifacts with a common lifecycle, from creation until deletion. The lifecycle itself consists of
 multiple different phases, each of them representing one stage of the whole lifecycle.
 
-### Lifecycle Phases
+### 2.1 Lifecycle Phases
 The full lifecycle consists out of specific execution phases, as follows:
 
 1. **VALIDATE**.
@@ -41,6 +49,8 @@ The full lifecycle consists out of specific execution phases, as follows:
    The final phase *destroy* is used to physically remove relations including their data. This will also remove table
    definitions, views and directories. It performs the opposite operation than the *create* phase.
 
+### 2.2 Built In Lifecycles
+
 Some execution phases can be performed in a meaningful way one after the other. Such a sequence of phases is
 called *lifecycle*. Flowman has the following lifecycles built in:
 
@@ -54,7 +64,7 @@ The second lifecycle contains only the single phase *TRUNCATE*
 The last lifecycle contains only the single phase *DESTROY*
 
 
-## Execution of Phases and Lifecycles
+## 3. Execution of Phases and Lifecycles
 
 Another lifecycle can be executed by replacing `build` with another execution phase. Flowman will then execute the
 lifecycle containing that phase up until this phase. If you want to skip all other execution phases, you can specify
@@ -64,10 +74,33 @@ lifecycle containing that phase up until this phase. If you want to skip all oth
 flowexec -f <project_dirctory> job <execution_phase> <job_name> [--force] [--no-lifecycle]
 ```
 
+The following examples will reuse the project of chapter 5.
+
 ### Perform full `BUILD` lifecycle
+
+```shell
+flowexec -f lessons/05-multiple-targets job build main
+```
 
 ### Perform full `DESTROY` lifecycle
 
+```shell
+flowexec -f lessons/05-multiple-targets job destroy main
+```
+
 ### Perform only `CREATE` phase
 
+```shell
+flowexec -f lessons/05-multiple-targets job create main --no-lifecycle
+```
+
 ### Perform only `BUILD` phase
+
+```shell
+flowexec -f lessons/05-multiple-targets job build main --no-lifecycle
+```
+
+
+## 4. Next Lesson
+In the next lesson, we will learn how to integrate relational databases as data sources and sinks by connecting them 
+to Flowman via JDBC.

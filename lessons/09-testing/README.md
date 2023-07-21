@@ -1,4 +1,6 @@
-# Lesson 7 - Testing
+# Lesson 9 — Testing
+
+## 1. What to Expect
 
 ### Objectives
 

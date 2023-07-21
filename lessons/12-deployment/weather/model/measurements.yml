@@ -1,0 +1,14 @@
+relations:
+  measurements:
+    kind: file
+    format: parquet
+    location: "$basedir/measurements/"
+    # Define data partitions. Each year is stored in a separate sub directory
+    partitions:
+      - name: year
+        type: integer
+        granularity: 1
+    # Use the inferred schema of the mapping that is written into the relation
+    schema:
+      kind: mapping
+      mapping: measurements_extracted

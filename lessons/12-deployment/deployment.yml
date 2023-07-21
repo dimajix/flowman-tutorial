@@ -1,0 +1,27 @@
+flowman:
+  version: ${flowman.version}
+  plugins:
+    - flowman-avro
+    - flowman-aws
+
+# List of subdirectories containing Flowman projects
+projects:
+  - weather
+
+# List of packages to be built
+packages:
+  # The first package is called "dist"
+  dist:
+    kind: dist
+
+  # The second package is called "jar"
+  jar:
+    # The package is a "fatjar" package, i.e. a single jar file containing both Flowman and your project
+    kind: fatjar
+
+execution:
+  javaOptions:
+    - -Dhttp.proxyHost=${http.proxyHost}
+    - -Dhttp.proxyPort=${http.proxyPort}
+    - -Dhttps.proxyHost=${https.proxyHost}
+    - -Dhttps.proxyPort=${https.proxyPort}

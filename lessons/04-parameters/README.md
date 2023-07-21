@@ -13,7 +13,7 @@ additional benefits in terms of process management: You can specify mandatory ex
 * You will understand the difference between environment variables and job parameters
 * You will learn the effect of using data partitions
 
-You can find the full source code of this lesson [on GitHub](https://github.com/dimajix/flowman-tutorial/tree/develop/lessons/04-parameters)
+You can find the full source code of this lesson [on GitHub](https://github.com/dimajix/flowman-tutorial/tree/main/lessons/04-parameters)
 
 ### Description
 Again, we will read in the raw measurement data, which contains many weather measurements per weather stations
